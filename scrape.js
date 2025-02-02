@@ -1,45 +1,50 @@
-// ----------------------------
-// 1) In plaats van "import", gebruik "require"
+const Apify = require('apify');          // <--- Apify SDK import
 const puppeteer = require('puppeteer-core');
-require('dotenv').config(); // (alleen nodig als je .env-variabelen gebruikt)
+require('dotenv').config(); // Alleen nodig als je .env-variabelen hebt
 
-// 2) Definieer je hoofd-functie voor scrapen
-async function scrapeOGImage(url) {
-    // 3) Start Puppeteer met een paar speciale instellingen
-    //    Zodat hij de Chrome van Apify gebruikt en niet zelf downloadt
+Apify.main(async () => {
+    // 1) Lees de Input van Apify
+    //    Als iemand in Apify bij het tabblad 'Input' dit invult:
+    //    { "urls": ["https://techcrunch.com", "https://example.com"] }
+    //    dan komt dat hier binnen als een JavaScript-object.
+    const input = await Apify.getInput();
+
+    if (!input || !input.urls) {
+        console.log('Geen "urls" in input, dus we stoppen.');
+        return;
+    }
+
+    // 2) Start Puppeteer (met Chrome van onze Docker, geen extra download)
     const browser = await puppeteer.launch({
-        headless: true,  // Draait onzichtbaar
+        headless: true,
         executablePath: process.env.CHROME_EXECUTABLE_PATH || '/usr/bin/google-chrome',
-        args: ['--no-sandbox', '--disable-setuid-sandbox'], // Oplossing voor Docker-permissies
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
-    const page = await browser.newPage();
-
     try {
-        // 4) Ga naar de gewenste URL
-        await page.goto(url, { waitUntil: 'domcontentloaded' });
+        // 3) Loop door elke URL in input.urls
+        for (const url of input.urls) {
+            const page = await browser.newPage();
 
-        // 5) Zoek in de HTML-pagina naar de og:image-tag
-        const ogImage = await page.evaluate(() => {
-            // In oudere Node-versies kunnen we geen "?." gebruiken.
-            // We doen het daarom "ouderwets":
-            const ogMeta = document.querySelector('meta[property="og:image"]');
-            return ogMeta ? ogMeta.content : 'Geen OG:image gevonden';
-        });
+            try {
+                await page.goto(url, { waitUntil: 'domcontentloaded' });
 
-        // 6) Print het resultaat in de terminal
-        console.log(`OG:image voor ${url}:`, ogImage);
-    } catch (error) {
-        // 7) Als er iets misgaat, print een foutmelding
-        console.error(`Fout bij scrapen van ${url}:`, error);
+                // 4) Check de og:image-tag
+                const ogImage = await page.evaluate(() => {
+                    const ogMeta = document.querySelector('meta[property="og:image"]');
+                    return ogMeta ? ogMeta.content : 'Geen OG:image gevonden';
+                });
+
+                // 5) Print in de logs (zie je bij 'Runs' > 'Dataset' of 'log')
+                console.log(`OG:image voor ${url}:`, ogImage);
+            } catch (error) {
+                console.error(`Fout bij scrapen van ${url}:`, error);
+            } finally {
+                await page.close();
+            }
+        }
     } finally {
-        // 8) Sluit de browser altijd netjes af
+        // 6) Browser sluiten
         await browser.close();
     }
-}
-
-// 9) Gebruik het eerste argument in de terminal als URL, anders "https://example.com"
-const url = process.argv[2] || 'https://example.com';
-
-// 10) Roep onze functie aan
-scrapeOGImage(url);
+});
