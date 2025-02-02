@@ -22,4 +22,5 @@ COPY . .
 USER node
 
 # Forceer Node.js om ES-modules correct te laden
-CMD ["node", "--experimental-modules", "scrape.js"]
+CMD ["node", "scrape.mjs"]
+
