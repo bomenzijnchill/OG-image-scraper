@@ -3,7 +3,6 @@ import puppeteer from 'puppeteer';
 const scrapeOGImage = async (url) => {
     const browser = await puppeteer.launch({
         headless: true,
-        executablePath: puppeteer.executablePath(), // Zorgt ervoor dat de juiste Chrome wordt gebruikt
         args: ['--no-sandbox', '--disable-setuid-sandbox'], // Fix voor Docker/Apify
     });
 
