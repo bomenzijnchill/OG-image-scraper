@@ -11,7 +11,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "apify": "^3.0.0",            // <-- nieuw toegevoegd
+    "apify": "^3.0.0",
     "dotenv": "^16.4.7",
     "puppeteer-core": "^24.1.1"
   }
