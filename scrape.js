@@ -2,8 +2,9 @@ import puppeteer from 'puppeteer';
 
 const scrapeOGImage = async (url) => {
     const browser = await puppeteer.launch({
-        headless: true,  
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],  // Fix voor Apify Docker-omgeving
+        headless: true,
+        executablePath: puppeteer.executablePath(), // Zorgt ervoor dat de juiste Chrome wordt gebruikt
+        args: ['--no-sandbox', '--disable-setuid-sandbox'], // Fix voor Docker/Apify
     });
 
     const page = await browser.newPage();
