@@ -2,8 +2,8 @@ import puppeteer from 'puppeteer';
 
 const scrapeOGImage = async (url) => {
     const browser = await puppeteer.launch({
-        headless: true,  // Zorg dat het in een Docker-omgeving werkt
-        args: ['--no-sandbox', '--disable-setuid-sandbox']  // Fix voor Apify
+        headless: true,  
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],  // Fix voor Apify Docker-omgeving
     });
 
     const page = await browser.newPage();
@@ -26,4 +26,3 @@ const scrapeOGImage = async (url) => {
 
 const url = process.argv[2] || 'https://example.com';
 scrapeOGImage(url);
-
