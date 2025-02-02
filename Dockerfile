@@ -1,4 +1,4 @@
-FROM apify/actor-node-puppeteer:latest
+FROM apify/actor-node-puppeteer:16
 
 # 1) Werkmap instellen
 WORKDIR /usr/src/app
