@@ -1,4 +1,4 @@
-FROM apify/actor-puppeteer-chrome:latest
+FROM apify/actor-node-puppeteer:latest
 
 # Zet de werkdirectory
 WORKDIR /usr/src/app
@@ -11,4 +11,5 @@ RUN npm install --only=prod
 
 # Start het script
 CMD ["node", "scrape.js"]
+
 
