@@ -1,25 +1,25 @@
 FROM apify/actor-node-puppeteer:latest
 
-# Zet de werkdirectory
+# 1) Werkmap instellen
 WORKDIR /usr/src/app
 
-# Stel de juiste gebruiker in (Apify runt als "node")
+# 2) Tijdelijk naar root-gebruiker zodat we permissies goedzetten
 USER root
 
-# Kopieer package.json en package-lock.json eerst (sneller bouwen)
+# 3) Eerst alleen package.json en package-lock.json kopiëren
 COPY package.json package-lock.json ./
 
-# Zorg dat de juiste gebruiker rechten heeft
+# 4) Zorg dat de map beschrijfbaar is
 RUN chown -R node:node /usr/src/app && chmod -R 777 /usr/src/app
 
-# Installeer afhankelijkheden met de juiste gebruiker
+# 5) Installeer dependencies
 RUN npm install --only=prod --unsafe-perm=true
 
-# Kopieer de rest van de bestanden
+# 6) Kopieer de rest van de bestanden
 COPY . .
 
-# Zet de juiste gebruiker terug naar "node"
+# 7) Zet gebruiker terug naar node (veiliger)
 USER node
 
-# Start het script (zonder --experimental-modules)
+# 8) Start ons script (CommonJS-stijl, zonder extra flags)
 CMD ["node", "scrape.js"]
