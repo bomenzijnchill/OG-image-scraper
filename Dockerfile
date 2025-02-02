@@ -1,14 +1,20 @@
-FROM apify/actor-node-chrome:latest
+FROM node:16
 
+# 1. Installeer Chrome
+RUN apt-get update && apt-get install -y wget gnupg
+RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add -
+RUN echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
+RUN apt-get update && apt-get install -y google-chrome-stable
+
+# 2. Werkdirectory
 WORKDIR /usr/src/app
-USER root
 
-COPY package.json package-lock.json ./
-RUN chown -R node:node /usr/src/app && chmod -R 777 /usr/src/app
-RUN npm install --only=prod --unsafe-perm=true
+# 3. Kopieer package.json en installeer
+COPY package*.json ./
+RUN npm install --only=prod
 
+# 4. Kopieer je code (scrape.js etc.)
 COPY . .
 
-USER node
-
+# 5. Start het script
 CMD ["node", "scrape.js"]
