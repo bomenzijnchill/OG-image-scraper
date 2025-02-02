@@ -1,7 +1,7 @@
 {
   "name": "koendijkstra",
   "version": "1.0.0",
-  "main": "scrape.js",
+  "main": "scrape.mjs",
   "type": "module",
   "scripts": {
     "start": "node scrape.js",
