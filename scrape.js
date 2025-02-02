@@ -1,20 +1,16 @@
-const Apify = require('apify');          // <--- Apify SDK import
+const { Actor } = require('apify');
 const puppeteer = require('puppeteer-core');
-require('dotenv').config(); // Alleen nodig als je .env-variabelen hebt
+require('dotenv').config();
 
-Apify.main(async () => {
-    // 1) Lees de Input van Apify
-    //    Als iemand in Apify bij het tabblad 'Input' dit invult:
-    //    { "urls": ["https://techcrunch.com", "https://example.com"] }
-    //    dan komt dat hier binnen als een JavaScript-object.
-    const input = await Apify.getInput();
-
+Actor.main(async () => {
+    // 1) Lees je input (bijv. { "urls": ["https://techcrunch.com"] })
+    const input = await Actor.getInput();
     if (!input || !input.urls) {
-        console.log('Geen "urls" in input, dus we stoppen.');
+        console.log('Geen "urls" in input gevonden!');
         return;
     }
 
-    // 2) Start Puppeteer (met Chrome van onze Docker, geen extra download)
+    // 2) Start Puppeteer
     const browser = await puppeteer.launch({
         headless: true,
         executablePath: process.env.CHROME_EXECUTABLE_PATH || '/usr/bin/google-chrome',
@@ -22,29 +18,21 @@ Apify.main(async () => {
     });
 
     try {
-        // 3) Loop door elke URL in input.urls
+        // 3) Loop door alle URLs in input.urls
         for (const url of input.urls) {
             const page = await browser.newPage();
+            await page.goto(url, { waitUntil: 'domcontentloaded' });
 
-            try {
-                await page.goto(url, { waitUntil: 'domcontentloaded' });
+            // 4) Check meta[property="og:image"]
+            const ogImage = await page.evaluate(() => {
+                const ogMeta = document.querySelector('meta[property="og:image"]');
+                return ogMeta ? ogMeta.content : 'Geen OG:image gevonden';
+            });
 
-                // 4) Check de og:image-tag
-                const ogImage = await page.evaluate(() => {
-                    const ogMeta = document.querySelector('meta[property="og:image"]');
-                    return ogMeta ? ogMeta.content : 'Geen OG:image gevonden';
-                });
-
-                // 5) Print in de logs (zie je bij 'Runs' > 'Dataset' of 'log')
-                console.log(`OG:image voor ${url}:`, ogImage);
-            } catch (error) {
-                console.error(`Fout bij scrapen van ${url}:`, error);
-            } finally {
-                await page.close();
-            }
+            console.log(`OG:image voor ${url}:`, ogImage);
+            await page.close();
         }
     } finally {
-        // 6) Browser sluiten
         await browser.close();
     }
 });
