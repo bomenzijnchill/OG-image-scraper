@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "scrape.js",
   "scripts": {
-    "start": "node scrape.js"
+    "start": "node scrape.js",
+    "postinstall": "echo 'Skipping Puppeteer postinstall step'"
   },
   "keywords": [],
   "type": "module",
@@ -12,6 +13,6 @@
   "description": "",
   "dependencies": {
     "dotenv": "^16.4.7",
-    "puppeteer": "^24.1.1"
+    "puppeteer-core": "^24.1.1"
   }
 }
