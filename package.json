@@ -2,12 +2,12 @@
   "name": "koendijkstra",
   "version": "1.0.0",
   "main": "scrape.js",
+  "type": "module",
   "scripts": {
     "start": "node scrape.js",
     "postinstall": "echo 'Skipping Puppeteer postinstall step'"
   },
   "keywords": [],
-  "type": "module",
   "author": "",
   "license": "ISC",
   "description": "",
