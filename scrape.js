@@ -1,9 +1,12 @@
-import puppeteer from 'puppeteer-core';
+// scrape.js
 
-const scrapeOGImage = async (url) => {
+const puppeteer = require('puppeteer-core');
+require('dotenv').config();
+
+async function scrapeOGImage(url) {
     const browser = await puppeteer.launch({
         headless: true,
-        executablePath: process.env.CHROME_EXECUTABLE_PATH || '/usr/bin/google-chrome', // Fix voor Apify
+        executablePath: process.env.CHROME_EXECUTABLE_PATH || '/usr/bin/google-chrome',
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
@@ -22,7 +25,7 @@ const scrapeOGImage = async (url) => {
     } finally {
         await browser.close();
     }
-};
+}
 
 const url = process.argv[2] || 'https://example.com';
 scrapeOGImage(url);

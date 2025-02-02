@@ -21,6 +21,5 @@ COPY . .
 # Zet de juiste gebruiker terug naar "node"
 USER node
 
-# Forceer Node.js om ES-modules correct te laden
-CMD ["node", "scrape.mjs"]
-
+# Start het script (zonder --experimental-modules)
+CMD ["node", "scrape.js"]
